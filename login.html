@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Log in — Roast & Ritual</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* small local styles to keep page tidy */
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(180deg,#0b0806,#1b1512);color:#fff}
+    .panel{background:#fff;color:#1b1816;padding:20px;border-radius:10px;max-width:420px;width:100%}
+    .panel h2{margin:0 0 8px}
+    .switch{display:flex;gap:8px;margin-bottom:12px}
+    .switch button{flex:1}
+    .small{font-size:.9rem;color:#666}
+  </style>
+</head>
+<body>
+  <!-- Login page: background video + centered login panel. The video element is present as the page background; do NOT show any upload controls. -->
+  <div class="login-page">
+    <video id="bgVideo" class="login-bgvideo" autoplay muted loop playsinline aria-hidden="true">
+      <!-- Add a source here (server-side) or via developer editing; left empty for now -->
+      <!-- Example: <source src="/media/login-bg.mp4" type="video/mp4"> -->
+    </video>
+
+    <header class="login-header">
+      <div class="logo"><div class="brand">Roast & Ritual</div></div>
+      <nav class="login-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="index.html#menu" class="nav-link">Menu</a>
+        <a href="index.html#location" class="nav-link">Location</a>
+      </nav>
+    </header>
+
+    <main class="login-main">
+      <div class="login-panel" role="dialog" aria-modal="true" aria-label="Login form">
+        <h2>Welcome back</h2>
+        <p class="muted">Sign in to continue to Roast & Ritual</p>
+        <form id="authForm">
+          <label class="field">
+            <span class="label">Email</span>
+            <input id="email2" type="email" autocomplete="email" required class="input" />
+          </label>
+          <label class="field">
+            <span class="label">Password</span>
+            <input id="password2" type="password" autocomplete="current-password" required class="input" />
+          </label>
+          <div class="actions-row">
+            <button type="button" id="cancel" class="btn">Cancel</button>
+            <button type="submit" class="btn primary large">Continue</button>
+          </div>
+        </form>
+        <p class="small muted">Don't have an account? <a href="#" id="signupLink">Sign up</a></p>
+      </div>
+    </main>
+
+    <footer class="login-footer">
+      <a href="index.html" class="nav-link">Return to site</a>
+      <span class="muted">&nbsp;·&nbsp;© <span id="loginYear"></span> Roast & Ritual</span>
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('authForm');
+      const cancel = document.getElementById('cancel');
+      const bgVideo = document.getElementById('bgVideo');
+      const loginYear = document.getElementById('loginYear');
+
+      // show year in footer
+      if(loginYear) loginYear.textContent = new Date().getFullYear();
+
+      // Cancel: close this window
+      cancel.addEventListener('click', ()=> window.close());
+
+      // On submit, postMessage to opener and close
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const email = document.getElementById('email2').value;
+        try{
+          if(window.opener && !window.opener.closed){
+              // opened as a popup: notify opener and close
+              window.opener.postMessage({type: 'login', email: email}, '*');
+              // also persist a flag in localStorage of the opener is same-origin (best-effort)
+              try{ window.opener.localStorage.setItem('rr_user_email', email); window.opener.localStorage.setItem('rr_logged_in','1'); }catch(err){}
+              setTimeout(()=> window.close(), 200);
+              return;
+            }
+        }catch(err){ /* ignore */ }
+        // opened in same tab: persist login and navigate back to index
+  try{ localStorage.setItem('rr_user_email', email); localStorage.setItem('rr_logged_in','1'); }catch(e){}
+        // redirect back to index (or history.back())
+        window.location.href = 'index.html';
+      });
+
+      // The video element is intentionally left without a source so you can add the video file
+      // to the project later (developer can edit login.html and add a <source> element).
+      // If a source is present it will play automatically (muted autoplay loop).
+      if(bgVideo && bgVideo.querySelectorAll('source').length){
+        bgVideo.play().catch(()=>{});
+      }
+    })();
+  </script>
+</body>
+</html>
