@@ -10,3 +10,6 @@ It might seem basic but it can get you somewhere.
 If you have any tips to help me improve thanks!
 I dont know what to add after this but i want to say thank you for having the time to read this and help<3
 I hope this helps!!
+
+This is the link for the preview of the website
+https://revenant1876.github.io/Just-a-coffee-website-project/
